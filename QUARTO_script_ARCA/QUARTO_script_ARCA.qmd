@@ -1,0 +1,23 @@
+---
+title: "QUARTO_script_ARCA"
+subtitle: "Analisi del dataset (Sara_dataset)"
+author: "Marco Foda"
+editor: source
+date: r Sys.Date()
+output: html_document
+embed-resources: true
+toc: true
+toc-title: Contents
+code-fold: true
+---
+
+#Cominciamo!
+##Analizziamo il dataset
+Come prima cosa, ho reso la variabile gender una variabile factor, distinguendo in M e F per maggiore chiarezza.
+```{r}
+library(readxl)
+dsara <- read_excel("Quarto_ARCA/Templates/html/Sara_dataset.xls")
+dsara$gender <- factor(dsara$gender,levels=c(1,2),labels = c("F","M"))
+
+?factor
+```
