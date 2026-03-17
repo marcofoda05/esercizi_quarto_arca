@@ -1,23 +1,110 @@
 ---
-title: "QUARTO_script_ARCA"
-subtitle: "Analisi del dataset (Sara_dataset)"
-author: "Marco Foda"
+title: "Una prima analisi sul dataset 'Sara_dataset'"
+author: Marco Foda
 editor: source
-date: r Sys.Date()
-output: html_document
-embed-resources: true
-toc: true
-toc-title: Contents
-code-fold: true
+date: today
+format:
+  html:
+    toc: true
+    toc-title: Contents
+    toc-location: left
+    number-sections: true
+    embed-resources: true
+execute:
+  cache: true
+  warning: false
+bibliography: references.bib
 ---
 
-#Cominciamo!
-##Analizziamo il dataset
-Come prima cosa, ho reso la variabile gender una variabile factor, distinguendo in M e F per maggiore chiarezza.
+# Cominciamo!
+
+## Summary del dataset, per vedere se è tutto ok
+
 ```{r}
 library(readxl)
 dsara <- read_excel("Quarto_ARCA/Templates/html/Sara_dataset.xls")
-dsara$gender <- factor(dsara$gender,levels=c(1,2),labels = c("F","M"))
-
-?factor
+summary(dsara)
 ```
+
+Utilizziamo la library readxl [@readxl] per leggere il dataset da Excel.  
+
+Dal summary notiamo che le prime 3 variabili, che dovrebbero essere categoriali, sono quantitative (dato che calcolano media e i 3 quartili), e non dovrebbe essere così. Rendiamole quindi categoriali:
+
+```{r}
+mydsara <- dsara #è buona pratica creare un altro dataset identico per non modificare l'originale
+mydsara$gender <- factor(mydsara$gender, levels=c(1,2), labels=c("M","F"))
+mydsara$major <- factor(mydsara$major, levels=(1:5))
+mydsara$cond <- factor(mydsara$cond, levels=(1:4))
+#Riguardiamo per vedere cos'è cambiato
+summary(mydsara[,1:3])
+```
+
+# Analisi descrittiva
+
+Guardiamo prima di tutto come sono distribuite le variabili categoriali tramite la funzione table. In particolare, è interessante vedere se i due gender sono equamente distribuiti tra le diverse condizioni sperimentali.
+
+```{r}
+table(mydsara$gender, mydsara$cond)
+```
+
+Da questo notiamo che i maschi si trovano in condizioni più "estreme", facili o impossibili, mentre le femmine sono distribuite maggiormente in condizioni "medie".\
+A questo punto, è interessante osservare se ci sono differenze nell'ansia pre, durante e post test tra i due gender
+
+```{r}
+par(mfrow=c(1,3))
+boxplot(anx_base ~ gender, data=mydsara)
+boxplot(anx_pre ~ gender, data=mydsara)
+boxplot(anx_post ~ gender, data=mydsara)
+```
+
+Visto quanto diminuisce la IQR tra il pre (secondo grafico) e il post (terzo grafico), possiamo dire che la variabilità iniziale (dovuta probabilmente alle condizioni sperimentali differenti), tende a diminuire e stabilizzarsi dopo il test. Nonostante ciò, l'ansia post test rimane comunque più alta dell'ansia base.
+
+# Correlazioni tra variabili
+
+A questo punto, risulta interessante scoprire se l'ansia pre-test possa essere predittiva del risultato al math quiz:
+
+```{r}
+leg_colori<- ifelse(mydsara$gender == "M", "#b3cde0", "#ffaaa5")
+plot(mydsara$anx_pre,mydsara$mathquiz, col = leg_colori, xlab="Ansia pre-test", ylab="Risultato al math quiz")
+risultati_premat <- cor.test(mydsara$anx_pre, mydsara$mathquiz)
+cor_premat <- round(risultati_premat$estimate,3)
+pvalue_premat <- round(risultati_premat$p.value,3)
+modello <- lm(mathquiz ~ anx_pre, data = mydsara)
+abline(modello, col = "red", lwd = 2)
+legend("topright", legend = c("M", "F"),  col = c("#b3cde0", "#ffaaa5"), pch = 1, title = "Genere")
+```
+
+Dal grafico si nota che la correlazione tra ansia pre-test e math_quiz risulta [NON]{style="color:red;"} essere significativa --\> $r =$ `r cor_premat` , $p =$ `r pvalue_premat`
+
+![](Quarto_ARCA\figures\notsignificant.jpg){fig-align="right" width="40%"}
+
+::: {style="text-align: right;"}
+*... se Altoè vedesse questa immagine non so cosa mi farebbe*
+:::
+
+# Conclusioni
+In questa piccola analisi descrittiva è stato esplorato il dataset "Sara_dataset", osservando prima di tutto la natura delle variabili. Successivamente, sono state descritte le differenze tra maschi e femmine nell'ansia di base, pre- e post-test, osservando che l'ansia mediana dei maschi era notevolmente più elevata rispetto a quella delle femmine.  
+Infine, è  stata analizzata la correlazione tra l'ansia pre-test e i risultati al quiz di matematica, ed è stato dimostrato che non esiste alcuna correlazione significativa tra queste due variabili.
+
+:::::: columns
+::: {.column width="45%"}
+[**Lati positivi**]{style="color:green;"}
+
+-   Dopo una breve analisi descrittiva, siamo giunti a una conclusione sensata e interessante: l'ansia pre-test non può essere considerata predittiva dei risultati di un test
+
+-   È stato molto divertente
+:::
+
+::: {.column width="10%"}
+:::
+
+::: {.column width="45%"}
+[**Lati negativi**]{style="color:red;"}
+
+-   L'analisi effettuata è molto riduttiva e si è occupata solamente di ansia pre-test e dei risultati del test matematico, senza approfondire ulteriormente le differenze tra genere, major, condizioni, ecc.
+
+-   Gemini a volte proprio non ce la fa
+:::
+::::::
+
+# Bibliografia
