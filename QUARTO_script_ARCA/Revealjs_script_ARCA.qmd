@@ -1,0 +1,244 @@
+---
+title: "Analisi descrittiva sull'ansia da matematica"
+author: "Marco Foda"
+format:
+  revealjs:
+    code-line-numbers: false
+    theme: solarized
+    slide-number: c/t
+    transition: slide
+    background-transition: fade
+    footer: "marco.foda@studenti.unipd.it"
+    logo: "Quarto_ARCA/figures/logo_unipd.png"
+    incremental: false
+    self-contained: true
+    embed-resources: true
+    toc: true 
+    toc-title: "Indice"
+    bibliography: references.bib
+    echo: true
+execute:
+  cache: true
+  warning: false
+editor: source
+---
+
+# Cominciamo!
+
+## Summary del dataset, per vedere se è tutto ok {transition="convex"}
+
+Utilizziamo la library readxl [@readxl] per leggere il dataset da Excel.
+
+```{r}
+library(readxl)
+dsara <- read_excel("Quarto_ARCA/Templates/html/Sara_dataset.xls")
+summary(dsara)
+```
+
+## Correggiamo le variabili
+
+Rendiamo le variabili categoriali
+
+```{r}
+#| echo: true
+#| code-line-numbers: "|2|3|4"
+#| output-location: fragment
+
+mydsara <- dsara #è buona pratica creare un altro dataset identico
+mydsara$gender <- factor(mydsara$gender, levels=c(1,2), labels=c("F","M")) #1
+mydsara$major <- factor(mydsara$major, levels=(1:5)) #2
+mydsara$cond <- factor(mydsara$cond, levels=(1:4)) #3
+#Riguardiamo per vedere cos'è cambiato
+summary(mydsara[,1:3])
+```
+
+# Analisi descrittiva
+
+## Distribuzione dei soggetti {transition="convex"}
+
+Per osservare come sono distribuiti maschi e femmine tra le varie condizioni sperimentali utilizziamo questa funzione:
+
+```{r}
+round(prop.table(table(mydsara$gender, mydsara$cond),margin=1),2)
+```
+
+Da questo notiamo che le femmine si trovano principalmente (58%) in condizioni più "estreme", facili o impossibili, mentre i maschi sono distribuiti maggiormente (60%) in condizioni "medie".
+
+::: footer
+Pima avevo scambiato M e F, menomale che Quarto è dinamico...
+:::
+
+## E la variabilità?
+
+Data questa differenza, ci aspettiamo maggiore variabilità post-test nelle femmine rispetto ai maschi, verifichiamolo:
+
+```{r}
+
+sd(mydsara[mydsara$gender=="M",]$anx_post)
+sd(mydsara[mydsara$gender=="F",]$anx_post)
+
+```
+
+## Boxplot a confronto {.unlisted}
+
+A questo punto, è interessante osservare anche tramite dei grafici se ci sono differenze nell'ansia di base, pre, e post test tra i due gender.
+
+::: aside
+*Codice R per la riproducibilità...*
+:::
+
+```{r}
+#| output: false
+
+par(mfrow=c(1,3))
+boxplot(anx_base ~ gender, data=mydsara, xlab="Genere", ylab="Ansia di base", main="Ansia di base", col=c("#ffb3ba","#bae1ff"))
+boxplot(anx_pre ~ gender, data=mydsara, xlab="Genere", ylab="Ansia pre-test", main="Ansia pre-test", col=c("#ffb3ba","#bae1ff"))
+boxplot(anx_post ~ gender, data=mydsara, xlab="Genere", ylab="Ansia post-test", main="Ansia post-test", col=c("#ffb3ba","#bae1ff"))
+```
+
+## Boxplot a confronto {.unlisted auto-animate="true"}
+
+::: {data-id="grafico-ansia"}
+```{r}
+#| echo: false
+#| fig-align: center
+#| fig-width: 12
+#| fig-height: 6.5
+
+par(mfrow=c(1,3))
+boxplot(anx_base ~ gender, data=mydsara, xlab="Genere", ylab="Ansia di base", main="Ansia di base", col=c("#ffb3ba","#bae1ff"))
+boxplot(anx_pre ~ gender, data=mydsara, xlab="Genere", ylab="Ansia pre-test", main="Ansia pre-test", col=c("#ffb3ba","#bae1ff"))
+boxplot(anx_post ~ gender, data=mydsara, xlab="Genere", ylab="Ansia post-test", main="Ansia post-test", col=c("#ffb3ba","#bae1ff"))
+```
+:::
+
+## Boxplot a confronto {.unlisted auto-animate="true"}
+
+Visto quanto diminuisce la IQR tra il pre- e il post-test, possiamo dire che la variabilità iniziale tende a diminuire e stabilizzarsi dopo il test.\
+Nonostante ciò, l'ansia post test rimane comunque più alta dell'ansia base.
+
+::: {data-id="grafico-ansia"}
+```{r}
+#| echo: false
+#| fig-align: center
+#| fig-width: 12
+#| fig-height: 3
+
+par(mfrow=c(1,3))
+boxplot(anx_base ~ gender, data=mydsara, xlab="Genere", ylab="Ansia di base", main="Ansia di base", col=c("#ffb3ba","#bae1ff"))
+boxplot(anx_pre ~ gender, data=mydsara, xlab="Genere", ylab="Ansia pre-test", main="Ansia pre-test", col=c("#ffb3ba","#bae1ff"))
+boxplot(anx_post ~ gender, data=mydsara, xlab="Genere", ylab="Ansia post-test", main="Ansia post-test", col=c("#ffb3ba","#bae1ff"))
+```
+:::
+
+# Correlazioni tra variabili {transition="convex"}
+
+## Ansia pre-test e risultati al math quiz {.scrollable .smaller}
+
+A questo punto, risulta ineressante scoprire se l'ansia pre-test possa essere predittiva del risultato al math quiz:
+
+```{r}
+#| code-fold: true
+#| fig-align: center 
+#| fig-width: 6
+#| fig-height: 5
+leg_colori<- ifelse(mydsara$gender == "M", "#b3cde0", "#ffaaa5")
+plot(mydsara$anx_pre,mydsara$mathquiz, col = leg_colori, xlab="Ansia pre-test", ylab="Risultato al math quiz")
+legend("topright", legend = c("M", "F"),  col = c("#b3cde0", "#ffaaa5"), pch = 1, title = "Genere")
+
+risultati_prematanx <- cor.test(mydsara$anx_pre, mydsara$mathquiz)
+cor_prematanx <- round(risultati_prematanx$estimate,3)
+pvalue_prematanx <- round(risultati_prematanx$p.value,3)
+rline_anxpre_mathquiz <- lm(mathquiz ~ anx_pre, data = mydsara)
+abline(rline_anxpre_mathquiz , col = "orange", lwd = 2)
+```
+
+## Ansia pre-test e risultati al math quiz {.unlisted}
+
+Dal grafico e dai risultati si nota che la correlazione tra ansia pre-test e math_quiz risulta non essere significativa:
+
+::: {style="text-align: center; font-size: 2em; color: red;"}
+$r =$ `r cor_prematanx` , $p =$ `r pvalue_prematanx`
+:::
+
+::: {.fragment .fade-up style="position: absolute; bottom: 10px; right: 30px; width: 40%;"}
+![](Quarto_ARCA\figures\notsignificant.jpg)
+:::
+
+## HR pre-test e risultati al mathquiz
+
+Osserviamo adesso la correlazione tra la HR pre-test e i risultati al math quiz:
+
+```{r}
+#| code-fold: true
+#| fig-align: center
+#| fig-width: 6
+#| fig-height: 5
+
+plot(mydsara$hr_pre, mydsara$mathquiz, col = leg_colori, xlab="HR pre-test", ylab="Risultato al math quiz")
+legend("topright", legend = c("M", "F"),  col = c("#b3cde0", "#ffaaa5"), pch = 1, title = "Genere")
+
+risultati_premathr <- cor.test(mydsara$hr_pre, mydsara$mathquiz)
+cor_premathr <- round(risultati_premathr$estimate,3)
+pvalue_premathr <- round(risultati_premathr$p.value,3)
+rline_hrpre_mathquiz <- lm(mathquiz ~ anx_pre, data = mydsara)
+abline(rline_hrpre_mathquiz , col = "purple", lwd = 2)
+```
+
+## HR pre-test e risultati al mathquiz {.unlisted}
+
+Notiamo che, dall'altra parte, la correlazione tra HR pre-test e risultato al math quiz risulta essere maggiore e significativa:
+
+::: {style="text-align: center; font-size: 2em; color: green;"}
+$r =$ `r cor_premathr` , $p =$ `r pvalue_premathr`
+:::
+
+::: {.fragment .fade-up style="position: absolute; bottom: 10px; right: 20px; width: 30%;"}
+![](Quarto_ARCA\figures\cat.jpg)
+:::
+
+# Conclusioni
+
+##  {.unlisted .scrollable}
+
+In questa analisi descrittiva è stato esplorato il dataset *Sara_dataset*: sono state descritte le differenze tra maschi e femmine nell'ansia di base, pre- e post-test, osservando che l'ansia mediana delle femmine era notevolmente più elevata rispetto a quella dei maschi.\
+Infine, sono state analizzate:
+
+-   La correlazione tra Ansia pre-test e risultati
+
+::: {style="color: green;"}
+($r =$ `r cor_prematanx` , $p =$ `r pvalue_prematanx`)
+:::
+
+-   La correlazione tra HR pre-test e risultati
+
+::: {style="color: red;"}
+($r =$ `r cor_premathr` , $p =$ `r pvalue_premathr`)
+:::
+
+##  {.unlisted}
+
+::::::: incremental
+:::::: columns
+::: {.column width="45%"}
+[**Lati positivi**]{style="color:green;"}
+
+-   Siamo giunti a una conclusione interessante: l'HR risulta essere maggiormente predittiva dell'ansia pre-test rispetto ai risultati del quiz
+
+-   È stato molto divertente
+:::
+
+::: {.column width="10%"}
+:::
+
+::: {.column width="45%"}
+[**Lati negativi**]{style="color:red;"}
+
+-   L'analisi effettuata è molto riduttiva e si è occupata solamente di ansia e HR pre-test, non sono state considerate molte altre variabili
+
+-   Gemini che si inventa le cose [@gemini2026]
+:::
+::::::
+:::::::
+
+# Bibliografia

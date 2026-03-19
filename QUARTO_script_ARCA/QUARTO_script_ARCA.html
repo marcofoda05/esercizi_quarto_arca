@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Marco Foda">
-<meta name="dcterms.date" content="2026-03-17">
+<meta name="dcterms.date" content="2026-03-18">
 
 <title>Una prima analisi sul dataset ‘Sara_dataset’</title>
 <style>
@@ -2373,7 +2373,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">March 17, 2026</p>
+      <p class="date">March 18, 2026</p>
     </div>
   </div>
   
@@ -2424,15 +2424,15 @@ window.Quarto = {
 <p>Dal summary notiamo che le prime 3 variabili, che dovrebbero essere categoriali, sono quantitative (dato che calcolano media e i 3 quartili), e non dovrebbe essere così. Rendiamole quindi categoriali:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>mydsara <span class="ot">&lt;-</span> dsara <span class="co">#è buona pratica creare un altro dataset identico per non modificare l&#39;originale</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>mydsara<span class="sc">$</span>gender <span class="ot">&lt;-</span> <span class="fu">factor</span>(mydsara<span class="sc">$</span>gender, <span class="at">levels=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>), <span class="at">labels=</span><span class="fu">c</span>(<span class="st">&quot;M&quot;</span>,<span class="st">&quot;F&quot;</span>))</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>mydsara<span class="sc">$</span>gender <span class="ot">&lt;-</span> <span class="fu">factor</span>(mydsara<span class="sc">$</span>gender, <span class="at">levels=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>), <span class="at">labels=</span><span class="fu">c</span>(<span class="st">&quot;F&quot;</span>,<span class="st">&quot;M&quot;</span>))</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>mydsara<span class="sc">$</span>major <span class="ot">&lt;-</span> <span class="fu">factor</span>(mydsara<span class="sc">$</span>major, <span class="at">levels=</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>))</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>mydsara<span class="sc">$</span>cond <span class="ot">&lt;-</span> <span class="fu">factor</span>(mydsara<span class="sc">$</span>cond, <span class="at">levels=</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>))</span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">#Riguardiamo per vedere cos&#39;è cambiato</span></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mydsara[,<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> gender major  cond  
- M:57   1:29   1:25  
- F:43   2:25   2:25  
+ F:57   1:29   1:25  
+ M:43   2:25   2:25  
         3:21   3:25  
         4:15   4:25  
         5:10         </code></pre>
@@ -2445,15 +2445,15 @@ window.Quarto = {
 <p>Guardiamo prima di tutto come sono distribuite le variabili categoriali tramite la funzione table. In particolare, è interessante vedere se i due gender sono equamente distribuiti tra le diverse condizioni sperimentali.<br>
 Tramite questa funzione, osserviamo le frequenze relative (dove il totale è per riga) di maschi e femmine tra le varie condizioni sperimentali:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">prop.table</span>(<span class="fu">table</span>(mydsara<span class="sc">$</span>gender, mydsara<span class="sc">$</span>cond),<span class="at">margin=</span><span class="dv">1</span>),<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">prop.table</span>(<span class="fu">table</span>(mydsara<span class="sc">$</span>gender, mydsara<span class="sc">$</span>cond), <span class="at">margin=</span><span class="dv">1</span>),<span class="dv">2</span> )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   
        1    2    3    4
-  M 0.28 0.26 0.16 0.30
-  F 0.21 0.23 0.37 0.19</code></pre>
+  F 0.28 0.26 0.16 0.30
+  M 0.21 0.23 0.37 0.19</code></pre>
 </div>
 </div>
-<p>Da questo notiamo che i maschi si trovano principalmente (58%) in condizioni più “estreme”, facili o impossibili, mentre le femmine sono distribuite maggiormente (60%) in condizioni “medie”. Data questa differenza, ci aspettiamo maggiore variabilità post-test nei maschi rispetto alle femmine, verifichiamolo:</p>
+<p>Da questo notiamo che le femmine si trovano principalmente (58%) in condizioni più “estreme”, facili o impossibili, mentre i maschi sono distribuiti maggiormente (60%) in condizioni “medie”. Data questa differenza, ci aspettiamo maggiore variabilità post-test nelle femmine rispetto ai maschi, verifichiamolo:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sd</span>(mydsara[mydsara<span class="sc">$</span>gender<span class="sc">==</span><span class="st">&quot;M&quot;</span>,]<span class="sc">$</span>anx_post)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">

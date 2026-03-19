@@ -30,7 +30,7 @@ Dal summary notiamo che le prime 3 variabili, che dovrebbero essere categoriali,
 
 ```{r}
 mydsara <- dsara #è buona pratica creare un altro dataset identico per non modificare l'originale
-mydsara$gender <- factor(mydsara$gender, levels=c(1,2), labels=c("M","F"))
+mydsara$gender <- factor(mydsara$gender, levels=c(1,2), labels=c("F","M"))
 mydsara$major <- factor(mydsara$major, levels=(1:5))
 mydsara$cond <- factor(mydsara$cond, levels=(1:4))
 #Riguardiamo per vedere cos'è cambiato
@@ -43,10 +43,10 @@ Guardiamo prima di tutto come sono distribuite le variabili categoriali tramite 
 Tramite questa funzione, osserviamo le frequenze relative (dove il totale è per riga) di maschi e femmine tra le varie condizioni sperimentali:
 
 ```{r}
-round(prop.table(table(mydsara$gender, mydsara$cond),margin=1),2)
+round(prop.table(table(mydsara$gender, mydsara$cond), margin=1),2 )
 ```
 
-Da questo notiamo che i maschi si trovano principalmente (58%) in condizioni più "estreme", facili o impossibili, mentre le femmine sono distribuite maggiormente (60%) in condizioni "medie". Data questa differenza, ci aspettiamo maggiore variabilità post-test nei maschi rispetto alle femmine, verifichiamolo:
+Da questo notiamo che le femmine si trovano principalmente (58%) in condizioni più "estreme", facili o impossibili, mentre i maschi sono distribuiti maggiormente (60%) in condizioni "medie". Data questa differenza, ci aspettiamo maggiore variabilità post-test nelle femmine rispetto ai maschi, verifichiamolo:
 ```{r}
 sd(mydsara[mydsara$gender=="M",]$anx_post)
 sd(mydsara[mydsara$gender=="F",]$anx_post)
